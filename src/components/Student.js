@@ -7,6 +7,31 @@ export default function Student() {
   const paperClasses={padding:'50px 20px', width:600, margin:"20px auto"}
   const[name,setName]=React.useState('')
   const[address,setAddress]=React.useState('')
+  const[students,setStudents]=React.useState([])
+
+  const handleClick=(e)=>{
+    e.preventDefault()
+    const student={name,address}
+    console.log(student)
+    fetch("http://localhost:8080/student/add",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(student)
+
+    }).then(()=>{
+      console.log("New Student added")
+    })
+  }
+
+  React.useEffect(()=>{
+    fetch("http://localhost:8080/student/getAll")
+    .then(res=>res.json())
+    .then((result)=>{
+      setStudents(result);
+    }
+  )
+  },[])
+
   return (
     <Container>
       <Paper elevation={3} style={paperClasses}>
@@ -27,12 +52,27 @@ export default function Student() {
       value={address}
       onChange={(e)=>setAddress(e.target.value)}
       />
-    <Button variant='contained' color='secondary'>Submit</Button>
+    <Button variant='contained' color='secondary' onClick={handleClick}>Submit</Button>
 
     </Box>
-    {name}
-    {address}
+    
     </Paper>
+      <h1>Students</h1>
+
+    <Paper elevation={3} style={paperClasses}>
+
+      {students.map(student=>(
+        <Paper elevation={6} style={{margin:"10px", padding:"15px", textAlign:"left"}} key={student.id}>
+          Id:{student.id}<br></br>
+          Name:{student.name}<br></br>
+          Address:{student.address}
+
+          </Paper>
+      ))
+ }
+
+    </Paper>
+
     </Container>
   );
 }
